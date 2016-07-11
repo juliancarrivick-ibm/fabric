@@ -24,33 +24,33 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// buildCommandHeirachyFromCobraCommand returns a slice describing the list of commands that make
-// up the given command. First element is the root command with the final command being the passed
-// in command itself.
-func buildCommandHeirachyFromCobraCommand(command *cobra.Command) []string {
-	commandChain := []string{}
+// getPeerCommandFromCobraCommand retreives the peer command from the cobra command struct.
+// i.e. for a command of `peer node start`, this should return "node"
+// For invalid commands (i.e. the main/root command and nil commands) this will return an empty string
+func getPeerCommandFromCobraCommand(command *cobra.Command) string {
+	var commandName string
 
 	if command == nil {
-		return commandChain
+		return commandName
 	}
 
-	commandChain = append(commandChain, command.Name())
-
-	for command.HasParent() {
-		command = command.Parent()
-		commandChain = append(commandChain, command.Name())
+	if peerCommand, ok := findChildOfRootCommand(command); ok {
+		commandName = peerCommand.Name()
 	}
 
-	return reverseArray(commandChain)
+	return commandName
 }
 
-func reverseArray(array []string) []string {
-	for i := 0; i < len(array)/2; i++ {
-		j := len(array) - i - 1
-		array[i], array[j] = array[j], array[i]
+func findChildOfRootCommand(command *cobra.Command) (*cobra.Command, bool) {
+	for command.HasParent() {
+		if !command.Parent().HasParent() {
+			return command, true
+		}
+
+		command = command.Parent()
 	}
 
-	return array
+	return nil, false
 }
 
 // The main command describes the service and

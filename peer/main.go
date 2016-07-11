@@ -72,7 +72,6 @@ func main() {
 	replacer := strings.NewReplacer(".", "_")
 	viper.SetEnvKeyReplacer(replacer)
 
-
 	var alternativeCfgPath = os.Getenv("PEER_CFG_PATH")
 	if alternativeCfgPath != "" {
 		logger.Info("User defined config file path: %s", alternativeCfgPath)

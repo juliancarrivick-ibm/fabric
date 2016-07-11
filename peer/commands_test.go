@@ -22,52 +22,46 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func TestBuildCommandHeirachySingleCommand(t *testing.T) {
+func TestBuildcommandNameOutputSingleCommand(t *testing.T) {
 	command := &cobra.Command{Use: "command"}
 
-	commandHeirachy := buildCommandHeirachyFromCobraCommand(command)
+	commandNameOutput := getPeerCommandFromCobraCommand(command)
 
-	assertSlicesEqual(t, []string{"command"}, commandHeirachy)
+	assertEqual(t, "", commandNameOutput)
 }
 
-func TestBuildCommandHeirachyNilCommand(t *testing.T) {
+func TestBuildcommandNameOutputNilCommand(t *testing.T) {
 	var command *cobra.Command
 
-	commandHeirachy := buildCommandHeirachyFromCobraCommand(command)
+	commandNameOutput := getPeerCommandFromCobraCommand(command)
 
-	assertSlicesEqual(t, []string{}, commandHeirachy)
+	assertEqual(t, "", commandNameOutput)
 }
 
-func TestBuildCommandHeirachyTwoCommands(t *testing.T) {
+func TestBuildcommandNameOutputTwoCommands(t *testing.T) {
 	rootCommand := &cobra.Command{Use: "rootcommand"}
 	childCommand := &cobra.Command{Use: "childcommand"}
 	rootCommand.AddCommand(childCommand)
 
-	commandHeirachy := buildCommandHeirachyFromCobraCommand(childCommand)
+	commandNameOutput := getPeerCommandFromCobraCommand(childCommand)
 
-	assertSlicesEqual(t, []string{"rootcommand", "childcommand"}, commandHeirachy)
+	assertEqual(t, "childcommand", commandNameOutput)
 }
 
-func TestBuildCommandHeirachyMultipleCommands(t *testing.T) {
+func TestBuildcommandNameOutputMultipleCommands(t *testing.T) {
 	rootCommand := &cobra.Command{Use: "rootcommand"}
 	childCommand := &cobra.Command{Use: "childcommand"}
 	leafCommand := &cobra.Command{Use: "leafCommand"}
 	rootCommand.AddCommand(childCommand)
 	childCommand.AddCommand(leafCommand)
 
-	commandHeirachy := buildCommandHeirachyFromCobraCommand(leafCommand)
+	commandNameOutput := getPeerCommandFromCobraCommand(leafCommand)
 
-	assertSlicesEqual(t, []string{"rootcommand", "childcommand", "leafCommand"}, commandHeirachy)
+	assertEqual(t, "childcommand", commandNameOutput)
 }
 
-func assertSlicesEqual(t *testing.T, expected []string, actual []string) {
-	if len(expected) != len(actual) {
-		t.Errorf("Incorrect length given. Expected %v, got %v", len(expected), len(actual))
-	}
-
-	for i := range expected {
-		if expected[i] != actual[i] {
-			t.Errorf("Element %v not correct. Expected %v, got %v", i, expected[i], actual[i])
-		}
+func assertEqual(t *testing.T, expected interface{}, actual interface{}) {
+	if expected != actual {
+		t.Errorf("Expected %v, got %v", expected, actual)
 	}
 }
